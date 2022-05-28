@@ -45,7 +45,7 @@ const login = async (req, res) => {
       payload,
       config.get("jwtSecret"),
       { expiresIn: 360000 },
-      (err, token) => {
+      (error, token) => {
         if (!error) throw error;
         res.json(token);
       }

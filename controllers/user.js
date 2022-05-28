@@ -11,7 +11,7 @@ const register = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { name, email, password } = req.body;
+  const { fullName, email, password } = req.body;
 
   try {
     let user = await User.findOne({ email });
@@ -20,7 +20,7 @@ const register = async (req, res) => {
       return res.status(400).json({ msg: "User already exists" });
     }
 
-    user = new User({ name, email, password });
+    user = new User({ fullName, email, password });
 
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(password, salt);
