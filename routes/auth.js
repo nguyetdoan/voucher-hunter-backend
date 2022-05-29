@@ -10,6 +10,12 @@ const authController = require("../controllers/auth");
 
 router.get("/", auth, authController.loadUser);
 
+// @route  GET api/auth
+// @desc   Get logged in user
+// @access Private
+
+router.get("/admin", auth, authController.loadAdmin);
+
 // @route  POST api/auth
 // @desc   Auth user & get token
 // @access Public

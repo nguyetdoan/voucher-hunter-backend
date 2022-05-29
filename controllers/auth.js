@@ -13,6 +13,21 @@ const loadUser = async (req, res) => {
   }
 };
 
+const loadAdmin = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+
+    if (user.role !== "admin") {
+      res.json({ msg: "Not Credentials!" });
+    }
+
+    res.json(user);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+};
+
 const login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -53,4 +68,5 @@ const login = async (req, res) => {
 module.exports = {
   loadUser,
   login,
+  loadAdmin,
 };
