@@ -23,6 +23,7 @@ app.use(express.json({ extended: false }));
 // Define Routes
 app.use("/api/user", require("./routes/user"));
 app.use("/api/auth", require("./routes/auth"));
+app.use("/api/product", require("./routes/product"));
 
 const PORT = process.env.PORT || 8080;
 
