@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const { check } = require("express-validator");
 const auth = require("../middleware/auth");
 const authController = require("../controllers/auth");
 
@@ -10,8 +9,8 @@ const authController = require("../controllers/auth");
 
 router.get("/", auth, authController.loadUser);
 
-// @route  GET api/auth
-// @desc   Get logged in user
+// @route  GET api/auth/admin
+// @desc   Get logged in admin
 // @access Private
 
 router.get("/admin", auth, authController.loadAdmin);

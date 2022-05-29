@@ -18,7 +18,7 @@ const loadAdmin = async (req, res) => {
     const user = await User.findById(req.user.id).select("-password");
 
     if (user.role !== "admin") {
-      res.json({ msg: "Not Credentials!" });
+      return res.status(400).json({ msg: "Invalid Credentials" });
     }
 
     res.json(user);
