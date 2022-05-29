@@ -9,6 +9,8 @@ const getProducts = async (req, res) => {
     category,
     order = "asc",
     sort,
+    lte,
+    gte,
   } = req.query;
 
   try {
@@ -31,6 +33,14 @@ const getProducts = async (req, res) => {
     if (category) {
       const regex = new RegExp(category, "i");
       list = list.filter((product) => regex.test(product.category));
+    }
+
+    if (lte) {
+      list = list.filter((product) => product.price < lte);
+    }
+
+    if (gte) {
+      list = list.filter((product) => product.price > gte);
     }
 
     if (sort && sortField.includes(sort)) {
@@ -102,7 +112,7 @@ const addProduct = async (req, res) => {
     });
 
     const product = await newProduct.save();
-    res.status(201).json(product);
+    res.status(200).json(product);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");

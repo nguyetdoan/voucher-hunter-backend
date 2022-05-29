@@ -19,12 +19,12 @@ const ProductSchema = mongoose.Schema({
     type: Number,
   },
   startDate: {
-    type: String,
+    type: Date,
   },
   endDate: {
-    type: String,
+    type: Date,
   },
-  images: [{ type: String, required: true }],
+  images: [{ type: String }],
   stock: {
     type: Number,
     required: true,
