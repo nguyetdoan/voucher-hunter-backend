@@ -11,7 +11,7 @@ const getProducts = async (req, res) => {
     sort,
     lte,
     gte,
-  } = req.query;
+  } = req.params;
 
   try {
     const products = await Product.find({});
@@ -54,10 +54,11 @@ const getProducts = async (req, res) => {
     }
 
     list = list.slice(size * (page - 1), size * page);
-    res.json({ list, totalPage: products.length, page, size });
+    let totalPages = Math.ceil(products.length / size);
+    res.json({ list, totalItems: products.length, totalPages, page, size });
   } catch (err) {
     console.error(err.message);
-    res.status(500).send("Server error");
+    res.status(500).send({ msg: "Server error" });
   }
 };
 
@@ -68,7 +69,7 @@ const getProductDetail = async (req, res) => {
     res.json(product);
   } catch (err) {
     console.error(err.message);
-    res.status(500).send("Server error");
+    res.status(500).send({ msg: "Server error" });
   }
 };
 
@@ -77,17 +78,17 @@ const addProduct = async (req, res) => {
   const user = await User.findById(userId);
 
   if (user.role !== "admin") {
-    res.json("Not authorized!");
+    res.status(401).json({ msg: "Not authorized!" });
   }
 
   const {
     category,
     name,
     price,
-    description,
+    detail,
     discount,
-    startDate,
-    endDate,
+    from,
+    to,
     images,
     stock,
     star,
@@ -100,10 +101,10 @@ const addProduct = async (req, res) => {
       category,
       name,
       price,
-      description,
+      detail,
       discount,
-      startDate,
-      endDate,
+      from,
+      to,
       images,
       stock,
       star,
@@ -115,7 +116,7 @@ const addProduct = async (req, res) => {
     res.status(200).json(product);
   } catch (err) {
     console.error(err.message);
-    res.status(500).send("Server Error");
+    res.status(500).send({ msg: "Server Error" });
   }
 };
 
@@ -124,17 +125,17 @@ const updateProduct = async (req, res) => {
   const user = await User.findById(userId);
 
   if (user.role !== "admin") {
-    res.json("Not authorized!");
+    res.status(401).json({ msg: "Not authorized!" });
   }
 
   const {
     category,
     name,
     price,
-    description,
+    detail,
     discount,
-    startDate,
-    endDate,
+    from,
+    to,
     images,
     stock,
     star,
@@ -146,10 +147,10 @@ const updateProduct = async (req, res) => {
   if (category) productFields.category = category;
   if (name) productFields.name = name;
   if (price) productFields.price = price;
-  if (description) productFields.description = description;
+  if (detail) productFields.detail = detail;
   if (discount) productFields.discount = discount;
-  if (startDate) productFields.startDate = startDate;
-  if (endDate) productFields.endDate = endDate;
+  if (from) productFields.from = from;
+  if (to) productFields.to = to;
   if (images) productFields.images = images;
   if (stock) productFields.stock = stock;
   if (star) productFields.star = star;
@@ -160,7 +161,7 @@ const updateProduct = async (req, res) => {
     let product = await Product.findById(req.params.id);
 
     if (!product) {
-      return res.status(401).json("Not found");
+      return res.status(401).json({ msg: "Not found" });
     }
 
     product = await Product.findByIdAndUpdate(
@@ -171,7 +172,7 @@ const updateProduct = async (req, res) => {
     res.json(product);
   } catch (err) {
     console.error(err.message);
-    res.status(500).send("Server Error");
+    res.status(500).send({ msg: "Server Error" });
   }
 };
 
@@ -180,22 +181,27 @@ const deleteProduct = async (req, res) => {
   const user = await User.findById(userId);
 
   if (user.role !== "admin") {
-    res.json("Not authorized!");
+    res.status(401).json({ msg: "Not authorized!" });
   }
 
   try {
     let product = await Product.findById(req.params.id);
 
     if (!product) {
-      return res.status(401).json("Not found");
+      return res.status(401).json({ msg: "Not found" });
     }
 
     product = await Product.findByIdAndRemove(req.params.id);
     res.json({ msg: "Product remove" });
   } catch (err) {
     console.error(err.message);
-    res.status(500).send("Server Error");
+    res.status(500).json({ msg: "Server Error" });
   }
+};
+
+const deleteAllProduct = async (_, res) => {
+  await Product.deleteMany({});
+  return res.json({ msg: "Deleted!!" });
 };
 
 module.exports = {
@@ -204,4 +210,5 @@ module.exports = {
   addProduct,
   updateProduct,
   deleteProduct,
+  deleteAllProduct,
 };

@@ -12,16 +12,16 @@ const ProductSchema = mongoose.Schema({
     type: Number,
     required: true,
   },
-  description: {
+  detail: {
     type: String,
   },
   discount: {
-    type: Number,
+    type: String,
   },
-  startDate: {
+  from: {
     type: Date,
   },
-  endDate: {
+  to: {
     type: Date,
   },
   images: [{ type: String }],
@@ -34,7 +34,7 @@ const ProductSchema = mongoose.Schema({
     default: 0,
   },
   updatedDate: {
-    type: Date,
+    type: String,
   },
   date: {
     type: Date,

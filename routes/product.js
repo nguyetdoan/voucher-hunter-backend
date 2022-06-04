@@ -32,5 +32,6 @@ router.put("/:id", auth, productController.updateProduct);
 // @access   Private
 
 router.delete("/:id", auth, productController.deleteProduct);
+router.delete("/", productController.deleteAllProduct);
 
 module.exports = router;
