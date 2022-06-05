@@ -2,6 +2,7 @@ const express = require("express");
 const connectDB = require("./config/db");
 const app = express();
 const cors = require("cors");
+
 const corsOptions = {
   origin: "*",
   credentials: true, //access-control-allow-credentials:true
