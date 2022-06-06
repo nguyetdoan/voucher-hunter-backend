@@ -11,7 +11,7 @@ const getProducts = async (req, res) => {
     sort,
     lte,
     gte,
-  } = req.params;
+  } = req.query;
 
   try {
     const products = await Product.find({});
@@ -24,6 +24,7 @@ const getProducts = async (req, res) => {
       "star",
       "date",
     ];
+
     let list = products;
     if (search) {
       const regex = new RegExp(search, "i");
@@ -56,6 +57,16 @@ const getProducts = async (req, res) => {
     list = list.slice(size * (page - 1), size * page);
     let totalPages = Math.ceil(products.length / size);
     res.json({ list, totalItems: products.length, totalPages, page, size });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send({ msg: "Server error" });
+  }
+};
+
+const getAllProducts = async (req, res) => {
+  try {
+    const products = await Product.find({});
+    res.json({ products });
   } catch (err) {
     console.error(err.message);
     res.status(500).send({ msg: "Server error" });
@@ -211,4 +222,5 @@ module.exports = {
   updateProduct,
   deleteProduct,
   deleteAllProduct,
+  getAllProducts,
 };

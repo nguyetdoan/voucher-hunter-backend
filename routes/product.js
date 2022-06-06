@@ -9,6 +9,12 @@ const productController = require("../controllers/product");
 
 router.get("/", productController.getProducts);
 
+// @route    GET api/products/all
+// @desc     Get all users products
+// @access   Private
+
+router.get("/all", productController.getAllProducts);
+
 // @route    GET api/products
 // @desc     Get all users products
 // @access   Private
