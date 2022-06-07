@@ -8,9 +8,6 @@ const Order = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     refs: "User",
   },
-  userId: {
-    type: String,
-  },
   items: [CartItem],
   information: {
     type: Object,

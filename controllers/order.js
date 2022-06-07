@@ -1,3 +1,4 @@
+const CartItem = require("../models/CartItem");
 const Order = require("../models/order");
 const User = require("../models/User");
 
@@ -65,7 +66,8 @@ const addOrder = async (req, res) => {
     });
 
     await newOrder.save();
-    return res.status(201).json(newOrder);
+    await CartItem.deleteMany({ userId: req.user.id });
+    return res.json({ msg: "Order Success" });
   } catch (err) {
     console.error(err.message);
     return res.status(500).send("Server Error");
