@@ -7,16 +7,6 @@ const register = require("../controllers/user");
 // @desc    Register a user
 // @access  Public
 
-router.post(
-  "/",
-  [
-    check("name", "Please add name").not().isEmpty(),
-    check("email", "Please include a valid email").isEmail(),
-    check("password", "Please enter a password 6 or more characters").isLength({
-      min: 6,
-    }),
-  ],
-  register
-);
+router.post("/", register);
 
 module.exports = router;

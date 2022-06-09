@@ -1,3 +1,4 @@
+const CartItem = require("../models/CartItem");
 const Product = require("../models/Product");
 const User = require("../models/User");
 
@@ -180,6 +181,13 @@ const updateProduct = async (req, res) => {
       { $set: productFields },
       { new: true }
     );
+
+    await CartItem.findByIdAndUpdate(
+      req.params.id,
+      { $set: productFields },
+      { new: true }
+    );
+
     res.json(product);
   } catch (err) {
     console.error(err.message);

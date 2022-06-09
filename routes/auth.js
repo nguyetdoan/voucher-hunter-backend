@@ -23,6 +23,14 @@ router.get("/admin", auth, authController.loadAdmin);
 
 router.post("/", authController.login);
 
+// @route  POST api/auth/admin
+// @desc   Auth user & get token
+// @access Public
+
+router.post("/", authController.loginAdmin);
+
 router.post("/google", authController.googleAuth);
+
+router.delete("/all", authController.deleteAllUser);
 
 module.exports = router;

@@ -7,7 +7,8 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const loadUser = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select("-password");
+    const user = await User.findById(req.user.id);
+
     res.json(user);
   } catch (err) {
     console.error(err.message);
@@ -17,15 +18,58 @@ const loadUser = async (req, res) => {
 
 const loadAdmin = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select("-password");
+    const user = await User.findById(req.user.id);
 
     if (user.role !== "admin") {
-      return res.status(400).json({ msg: "Invalid Credentials" });
+      return res.status(401).json({ msg: "Invalid Credentials" });
     }
 
+    console.log(user);
     res.json(user);
   } catch (err) {
     console.error(err.message);
+    res.status(500).json({ msg: "Server Error" });
+  }
+};
+
+const loginAdmin = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({ msg: "Not authorized!!" });
+    }
+
+    if (user.role !== "admin") {
+      return res.status(400).json({ msg: "Not authorized!!" });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(400).json({ msg: "Your Password is Not Correct!!" });
+    }
+
+    const payload = {
+      user: {
+        id: user.id,
+      },
+    };
+
+    console.log(user);
+    jwt.sign(
+      payload,
+      config.get("jwtSecret"),
+      { expiresIn: 360000 },
+      (err, token) => {
+        if (err) throw err;
+        res.json({ user, token });
+      }
+    );
+  } catch (err) {
+    console.log(err.message);
     res.status(500).json({ msg: "Server Error" });
   }
 };
@@ -38,6 +82,10 @@ const login = async (req, res) => {
 
     if (!user) {
       return res.status(400).json({ msg: "Your Email is Not Correct!!" });
+    }
+
+    if (!user.password) {
+      return res.status(400).json({ msg: "Please login by Google!!" });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -58,7 +106,7 @@ const login = async (req, res) => {
       { expiresIn: 360000 },
       (err, token) => {
         if (err) throw err;
-        res.json(token);
+        res.json({ user, token });
       }
     );
   } catch (err) {
@@ -98,7 +146,7 @@ const googleAuth = async (req, res) => {
         { expiresIn: 360000 },
         (err, token) => {
           if (err) throw err;
-          res.json(token);
+          res.json({ user, token });
         }
       );
     }
@@ -115,7 +163,7 @@ const googleAuth = async (req, res) => {
       { expiresIn: 360000 },
       (err, token) => {
         if (err) throw err;
-        res.json(token);
+        res.json({ token, user });
       }
     );
   } catch (err) {
@@ -124,9 +172,15 @@ const googleAuth = async (req, res) => {
   }
 };
 
+const deleteAllUser = async (req, res) => {
+  await User.deleteMany({}), res.json({ msg: "Deleted!!" });
+};
+
 module.exports = {
   loadUser,
   login,
   loadAdmin,
   googleAuth,
+  loginAdmin,
+  deleteAllUser,
 };
