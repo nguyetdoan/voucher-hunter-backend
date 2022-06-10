@@ -23,8 +23,6 @@ const loadAdmin = async (req, res) => {
     if (user.role !== "admin") {
       return res.status(401).json({ msg: "Invalid Credentials" });
     }
-
-    console.log(user);
     res.json(user);
   } catch (err) {
     console.error(err.message);
@@ -81,7 +79,7 @@ const login = async (req, res) => {
     let user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(400).json({ msg: "Your Email is Not Correct!!" });
+      return res.status(400).json({ msg: "Invalid Email or Password!" })
     }
 
     if (!user.password) {
@@ -91,7 +89,7 @@ const login = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      return res.status(400).json({ msg: "Your Password is Not Correct!!" });
+      return res.status(400).json({ msg: "Invalid Email or Password!" });
     }
 
     const payload = {

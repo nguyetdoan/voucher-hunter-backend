@@ -9,7 +9,7 @@ const getProducts = async (req, res) => {
     search,
     category,
     order = "asc",
-    sort,
+    sortBy,
     lte,
     gte,
   } = req.query;
@@ -45,7 +45,7 @@ const getProducts = async (req, res) => {
       list = list.filter((product) => product.price > gte);
     }
 
-    if (sort && sortField.includes(sort)) {
+    if (sortBy && sortField.includes(sortBy)) {
       list = list.sort((a, b) =>
         order === "asc" && a[sort] < b[sort]
           ? -1

@@ -7,12 +7,15 @@ const getCart = async (req, res) => {
     const cart = await CartItem.find({ userId });
 
     const totalPrice = cart.reduce((total, current) => {
-      if (current.discount && current.to > new Date()) {
-        const discountPrice =
-          current.price -
-          (current.discount.split("%")[0] * current.price) / 100;
+      if (
+        current.discount &&
+        new Date(current.to).getTime() > new Date().getTime() &&
+        new Date(current.from).getTime() < new Date().getTime()
+      ) {
+        const discountPrice = current.price - (current.discount.split("%")[0] * current.price) / 100;
         return total + discountPrice * current.quantity;
       }
+
       total + current.price * current.quantity;
     }, 0);
 
@@ -30,8 +33,6 @@ const addToCart = async (req, res) => {
     productId: req.body._id,
   });
 
-  console.log(cartItem);
-
   const { name, price, discount, from, to, images, stock, _id, quantity } =
     req.body;
 
@@ -42,7 +43,7 @@ const addToCart = async (req, res) => {
         price,
         discount,
         from,
-        quantity,
+        quantity: +quantity,
         to,
         images,
         stock,
@@ -54,7 +55,7 @@ const addToCart = async (req, res) => {
       return res.status(200).json(newCartItem);
     }
 
-    cartItem.quantity += quantity;
+    cartItem.quantity += +quantity;
     await cartItem.save();
 
     return res.json(cartItem);
