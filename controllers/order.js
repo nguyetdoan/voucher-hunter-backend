@@ -66,6 +66,12 @@ const addOrder = async (req, res) => {
     });
 
     await newOrder.save();
+
+    for (let item in items) {
+      const product = await Product.findById(item.productId);
+      product.purchases += item.quantity;
+      await product.save()
+    }
     await CartItem.deleteMany({ userId: req.user.id });
     return res.json({ msg: "Order Success" });
   } catch (err) {

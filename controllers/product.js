@@ -8,14 +8,14 @@ const getProducts = async (req, res) => {
     page = 1,
     search,
     category,
-    order = "asc",
+    order,
     sortBy,
     lte,
     gte,
   } = req.query;
 
   try {
-    const products = await Product.find({});
+    const products = await Product.find({}).sort({date: -1});
     const sortField = [
       "category",
       "name",
@@ -44,20 +44,30 @@ const getProducts = async (req, res) => {
     if (gte) {
       list = list.filter((product) => product.price > gte);
     }
-
     if (sortBy && sortField.includes(sortBy)) {
-      list = list.sort((a, b) =>
-        order === "asc" && a[sort] < b[sort]
+
+      switch(sortBy) {
+        case "discount":
+          list = list.sort((a, b) =>
+        order === "ascend" && +a[sortBy].split("%")[0] < +b[sortBy].split("%")[0]
           ? -1
-          : order === "desc" && a[sort] > b[sort]
+          : order === "descend" && +a[sortBy].split("%")[0] > +b[sortBy].split("%")[0]
           ? -1
-          : 1
-      );
+          : 1)
+        break;
+        default:
+          list = list.sort((a, b) =>
+        order === "ascend" && a[sortBy] < b[sortBy]
+          ? -1
+          : order === "descend" && a[sortBy] > b[sortBy]
+          ? -1
+          : 1)
+      }
     }
 
     list = list.slice(size * (page - 1), size * page);
     let totalPages = Math.ceil(products.length / size);
-    res.json({ list, totalItems: products.length, totalPages, page, size });
+    res.json({ list, totalItems: products.length, totalPages, page: +page, size: +size });
   } catch (err) {
     console.error(err.message);
     res.status(500).send({ msg: "Server error" });
@@ -188,7 +198,9 @@ const updateProduct = async (req, res) => {
       { new: true }
     );
 
-    res.json(product);
+    await product.save()
+
+    res.json({product});
   } catch (err) {
     console.error(err.message);
     res.status(500).send({ msg: "Server Error" });
