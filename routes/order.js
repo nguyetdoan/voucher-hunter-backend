@@ -27,4 +27,10 @@ router.get("/:id", auth, orderController.getOrderDetail);
 
 router.post("/", auth, orderController.addOrder);
 
+// @route    DELETE api/order
+// @desc     Delete all user order
+// @access   Private
+
+router.delete("/", auth, orderController.deleteOrder);
+
 module.exports = router;

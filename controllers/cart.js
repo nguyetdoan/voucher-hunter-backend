@@ -9,14 +9,14 @@ const getCart = async (req, res) => {
     const totalPrice = cart.reduce((total, current) => {
       if (
         current.discount &&
-        new Date(current.to).getTime() > new Date().getTime() &&
-        new Date(current.from).getTime() < new Date().getTime()
+        +new Date(current.to) > +new Date() &&
+        +new Date(current.from) < +new Date()
       ) {
         const discountPrice = current.price - (current.discount.split("%")[0] * current.price) / 100;
         return total + discountPrice * current.quantity;
       }
 
-      total + current.price * current.quantity;
+      return total + current.price * current.quantity;
     }, 0);
 
     const totalQuantity = cart.length;
@@ -57,7 +57,6 @@ const addToCart = async (req, res) => {
 
     cartItem.quantity += +quantity;
     await cartItem.save();
-
     return res.json(cartItem);
   } catch (err) {
     console.error(err.message);
@@ -118,7 +117,7 @@ const deleteItem = async (req, res) => {
   }
 };
 
-const deleteCart = async (_, res) => {
+const deleteCart = async (req, res) => {
   await CartItem.deleteMany({ userId: req.user.id });
   return res.json({ msg: "Deleted!!" });
 };
@@ -127,7 +126,6 @@ module.exports = {
   getCart,
   addToCart,
   updateItem,
-  deleteItem,
   deleteItem,
   deleteCart,
 };

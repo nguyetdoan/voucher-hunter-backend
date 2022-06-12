@@ -8,10 +8,9 @@ const Order = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     refs: "User",
   },
-  items: [CartItem],
+  cart: [CartItem],
   information: {
     type: Object,
-    required: true,
   },
   totalPrice: {
     type: Number,

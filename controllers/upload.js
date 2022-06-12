@@ -5,7 +5,6 @@ const upload = async (req, res) => {
   try {
     const fileStr = req.body.data;
     const uploadResponse = await cloudinary.uploader.upload(fileStr, {
-      public_id: "voucher_hunter",
       format: "png",
       resouce_type: "image",
     });

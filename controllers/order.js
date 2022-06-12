@@ -1,5 +1,6 @@
 const CartItem = require("../models/CartItem");
 const Order = require("../models/Order");
+const Product = require("../models/Product");
 const User = require("../models/User");
 
 const getUserOrders = async (req, res) => {
@@ -55,11 +56,12 @@ const getOrderDetail = async (req, res) => {
 };
 
 const addOrder = async (req, res) => {
-  const { items, totalPrice, information } = req.body;
+  const { cart, totalPrice, information } = req.body;
 
   try {
+
     const newOrder = new Order({
-      items,
+      cart,
       totalPrice,
       information,
       userId: req.user.id,
@@ -67,9 +69,13 @@ const addOrder = async (req, res) => {
 
     await newOrder.save();
 
-    for (let item in items) {
+    for (let item of cart) {
       const product = await Product.findById(item.productId);
-      product.purchases += item.quantity;
+
+      if (product.purchases) {
+        product.purchases += item.quantity;
+      } else product.purchases = item.quantity
+      
       await product.save()
     }
     await CartItem.deleteMany({ userId: req.user.id });
@@ -80,9 +86,15 @@ const addOrder = async (req, res) => {
   }
 };
 
+const deleteOrder = async (req, res) => {
+  await Order.deleteMany({ userId: req.user.id });
+  return res.json({ msg: "Deleted!!" });
+};
+
 module.exports = {
   getUserOrders,
   getAllOrders,
   addOrder,
   getOrderDetail,
+  deleteOrder
 };

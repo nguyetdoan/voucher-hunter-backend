@@ -42,7 +42,12 @@ const ProductSchema = mongoose.Schema({
   },
   purchases: {
     type: Number,
-  }
+    default: 0
+  },
+  hearts: [{
+    type: mongoose.Schema.Types.ObjectId,
+    refs: "User",
+  }]
 });
 
 const Product = mongoose.model("product", ProductSchema);

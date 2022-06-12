@@ -223,6 +223,7 @@ const deleteProduct = async (req, res) => {
     }
 
     product = await Product.findByIdAndRemove(req.params.id);
+    await CartItem.deleteMany({productId: req.params.id})
     res.json({ msg: "Product remove" });
   } catch (err) {
     console.error(err.message);

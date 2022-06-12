@@ -56,7 +56,6 @@ const loginAdmin = async (req, res) => {
       },
     };
 
-    console.log(user);
     jwt.sign(
       payload,
       config.get("jwtSecret"),
