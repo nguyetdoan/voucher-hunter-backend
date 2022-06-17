@@ -1,6 +1,7 @@
 const CartItem = require("../models/CartItem");
 const Product = require("../models/Product");
 const User = require("../models/User");
+const Heart = require("../models/Heart")
 
 const getProducts = async (req, res) => {
   let {
@@ -67,12 +68,100 @@ const getProducts = async (req, res) => {
 
     list = list.slice(size * (page - 1), size * page);
     let totalPages = Math.ceil(products.length / size);
+
+    
     res.json({ list, totalItems: products.length, totalPages, page: +page, size: +size });
   } catch (err) {
     console.error(err.message);
     res.status(500).send({ msg: "Server error" });
   }
 };
+
+const getProductsByUser = async (req, res) => {
+  let {
+    size = 10,
+    page = 1,
+    search,
+    category,
+    order,
+    sortBy,
+    lte,
+    gte,
+  } = req.query;
+
+  try {
+    const products = await Product.find({}).sort({date: -1});
+    const sortField = [
+      "category",
+      "name",
+      "price",
+      "discount",
+      "stock",
+      "star",
+      "date",
+    ];
+
+    let list = products;
+    if (search) {
+      const regex = new RegExp(search, "i");
+      list = list.filter((product) => regex.test(product.name));
+    }
+
+    if (category) {
+      const regex = new RegExp(category, "i");
+      list = list.filter((product) => regex.test(product.category));
+    }
+
+    if (lte) {
+      list = list.filter((product) => product.price < lte);
+    }
+
+    if (gte) {
+      list = list.filter((product) => product.price > gte);
+    }
+    if (sortBy && sortField.includes(sortBy)) {
+
+      switch(sortBy) {
+        case "discount":
+          list = list.sort((a, b) =>
+        order === "ascend" && +a[sortBy].split("%")[0] < +b[sortBy].split("%")[0]
+          ? -1
+          : order === "descend" && +a[sortBy].split("%")[0] > +b[sortBy].split("%")[0]
+          ? -1
+          : 1)
+        break;
+        default:
+          list = list.sort((a, b) =>
+        order === "ascend" && a[sortBy] < b[sortBy]
+          ? -1
+          : order === "descend" && a[sortBy] > b[sortBy]
+          ? -1
+          : 1)
+      }
+    }
+
+    list = list.slice(size * (page - 1), size * page);
+    let totalPages = Math.ceil(products.length / size);
+
+    for (let product of list) {
+      
+      const heart = await Heart.findOne({productId: product._id, userId: req.user.id});
+      const hearts = await Heart.find({productId:  product._id});
+      
+      product.hearts = hearts;
+      product.isLoved = heart ? true : false;
+      await product.save()  
+    }
+
+    
+    res.json({ list, totalItems: products.length, totalPages, page: +page, size: +size });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send({ msg: "Server error" });
+  }
+};
+
+
 
 const getAllProducts = async (req, res) => {
   try {
@@ -244,4 +333,5 @@ module.exports = {
   deleteProduct,
   deleteAllProduct,
   getAllProducts,
+  getProductsByUser
 };

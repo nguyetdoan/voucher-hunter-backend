@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Heart = require("./Heart").schema
 
 const ProductSchema = mongoose.Schema({
   category: {
@@ -44,10 +45,10 @@ const ProductSchema = mongoose.Schema({
     type: Number,
     default: 0
   },
-  hearts: [{
-    type: mongoose.Schema.Types.ObjectId,
-    refs: "User",
-  }]
+  isLoved: {
+    type: Boolean,
+    default: false
+  }
 });
 
 const Product = mongoose.model("product", ProductSchema);
